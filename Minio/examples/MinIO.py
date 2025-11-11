@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from minio import Minio
 from minio.error import S3Error
 
+from Minio.minio_client import MinIOManager, MinIOConfigError, MinIOConnectionError
+
 # ✅ Tentativa 1: ler do .env (local)
 from dotenv import load_dotenv
 from pathlib import Path
@@ -93,5 +95,6 @@ def read_file(object_name: str, bucket: str = None):
             print(f"❌ Erro ao reconectar ao MinIO: {e}")
             return None
     return manager.read_file(object_name, bucket)
+
 
 
