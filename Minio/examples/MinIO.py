@@ -5,24 +5,23 @@ from dotenv import load_dotenv
 from minio import Minio
 from minio.error import S3Error
 
-# Caminho absoluto até o .env
-ENV_PATH = os.path.join(os.path.dirname(__file__), "..", ".env")
+# ✅ Tentativa 1: ler do .env (local)
+from dotenv import load_dotenv
+from pathlib import Path
+env_path = Path(__file__).resolve().parents[1] / ".env"
+load_dotenv(env_path)
 
-# Carregar variáveis de ambiente
-if os.path.exists(ENV_PATH):
-    load_dotenv(ENV_PATH)
-    print("🔍 Debug ENV:", os.getenv("MINIO_ENDPOINT"))
-else:
-    print(f"⚠️  Arquivo .env não encontrado em: {ENV_PATH}")
-
-class MinIOConfigError(Exception):
-    """Erro de configuração do MinIO."""
+# ✅ Tentativa 2: ler do st.secrets (Streamlit Cloud)
+try:
+    import streamlit as st
+    if "MINIO_ENDPOINT" in st.secrets:
+        os.environ["MINIO_ENDPOINT"] = st.secrets["MINIO_ENDPOINT"]
+        os.environ["MINIO_ACCESS_KEY"] = st.secrets["MINIO_ACCESS_KEY"]
+        os.environ["MINIO_SECRET_KEY"] = st.secrets["MINIO_SECRET_KEY"]
+        os.environ["MINIO_BUCKET"] = st.secrets["MINIO_BUCKET"]
+        print("✅ Variáveis carregadas do Streamlit Cloud!")
+except Exception:
     pass
-
-class MinIOConnectionError(Exception):
-    """Erro de conexão com o servidor MinIO."""
-    pass
-
 
 class MinIOManager:
     """Gerenciador simplificado de conexão e leitura de arquivos no MinIO."""
@@ -94,4 +93,5 @@ def read_file(object_name: str, bucket: str = None):
             print(f"❌ Erro ao reconectar ao MinIO: {e}")
             return None
     return manager.read_file(object_name, bucket)
+
 
