@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from minio_client import MinIOManager, MinIOConfigError, MinIOConnectionError # type: ignore
 
 # Carregar configurações do arquivo .env
-load_dotenv(dotenv_path=r'\\tableau\Central_de_Performance\BI\MINIO\minio-etl-toolkit\.env')
+load_dotenv()  # carrega o .env local, se existir
 
 try:
     manager = MinIOManager(
@@ -71,4 +71,5 @@ def read_file(object_name, bucket_name):
 
 #upload('dados/demandaFracionado.parquet', 'consultoria-fabio', r'\\tableau\Central_de_Performance\BI\Local\Bases_Tratadas\Banca_Frete_OF.parquet')
 #download('dados/demandaFracionado.parquet', 'consultoria-fabio', r"C:\Users\ricardo.santos\Downloads\TESTE.parquet")
+
 #print('Fim')
