@@ -1,75 +1,95 @@
 import os
-import sys
-from pathlib import Path
-from dotenv import load_dotenv
+import io
 import pandas as pd
-from io import BytesIO
+from dotenv import load_dotenv
+from minio import Minio
+from minio.error import S3Error
 
-# Adicionar o diretório pai ao path para importar minio_client
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+# Caminho absoluto até o .env
+ENV_PATH = os.path.join(os.path.dirname(__file__), "..", ".env")
 
-# Importar o MinIOManager
-from minio_client import MinIOManager, MinIOConfigError, MinIOConnectionError # type: ignore
+# Carregar variáveis de ambiente
+if os.path.exists(ENV_PATH):
+    load_dotenv(ENV_PATH)
+else:
+    print(f"⚠️  Arquivo .env não encontrado em: {ENV_PATH}")
 
-# Carregar configurações do arquivo .env
-load_dotenv()  # carrega o .env local, se existir
+class MinIOConfigError(Exception):
+    """Erro de configuração do MinIO."""
+    pass
 
+class MinIOConnectionError(Exception):
+    """Erro de conexão com o servidor MinIO."""
+    pass
+
+
+class MinIOManager:
+    """Gerenciador simplificado de conexão e leitura de arquivos no MinIO."""
+
+    def __init__(self):
+        self.endpoint = os.getenv("MINIO_ENDPOINT")
+        self.access_key = os.getenv("MINIO_ACCESS_KEY")
+        self.secret_key = os.getenv("MINIO_SECRET_KEY")
+        self.bucket = os.getenv("MINIO_BUCKET")
+
+        # Verifica se todas as variáveis estão configuradas
+        if not all([self.endpoint, self.access_key, self.secret_key, self.bucket]):
+            raise MinIOConfigError(
+                "❌ Variáveis do .env não encontradas. Verifique o arquivo .env!"
+            )
+
+        try:
+            self.client = Minio(
+                self.endpoint,
+                access_key=self.access_key,
+                secret_key=self.secret_key,
+                secure=True  # usar HTTPS se possível
+            )
+            print(f"✅ Conectado ao MinIO ({self.endpoint})")
+        except Exception as e:
+            raise MinIOConnectionError(f"Erro ao conectar no MinIO: {e}")
+
+
+    def read_file(self, object_name: str, bucket: str = None):
+        """Lê um arquivo Parquet ou CSV diretamente do MinIO e devolve um DataFrame."""
+        bucket = bucket or self.bucket
+        try:
+            response = self.client.get_object(bucket, object_name)
+            data = response.read()
+            if object_name.endswith(".parquet"):
+                df = pd.read_parquet(io.BytesIO(data))
+            elif object_name.endswith(".csv"):
+                df = pd.read_csv(io.BytesIO(data))
+            else:
+                raise ValueError("Tipo de arquivo não suportado. Use .parquet ou .csv")
+
+            print(f"📥 Arquivo '{object_name}' carregado com sucesso do bucket '{bucket}'!")
+            return df
+        except S3Error as e:
+            print(f"❌ Erro no MinIO (S3): {e}")
+            return None
+        except Exception as e:
+            print(f"❌ Erro geral ao ler o arquivo '{object_name}': {e}")
+            return None
+
+
+# Instância global do gerenciador
 try:
-    manager = MinIOManager(
-        endpoint=os.getenv("MINIO_ENDPOINT", "localhost:9000"),
-        access_key=os.getenv("MINIO_ACCESS_KEY", "minioadmin"),
-        secret_key=os.getenv("MINIO_SECRET_KEY", "minioadmin"),
-        secure=os.getenv("MINIO_SECURE", "false").lower() == "true"
-    )
-    print(f"✅ Conectado ao MinIO: {manager.endpoint}")
-except (MinIOConfigError, MinIOConnectionError) as e:
-    print(f"❌ Erro de conexão: {e}")
+    manager = MinIOManager()
+except Exception as e:
+    print(f"⚠️  Não foi possível inicializar o MinIOManager: {e}")
+    manager = None
 
-def upload(object_name, bucket_name, sample_file):
-    # 5. Upload do arquivo
-    print(f"\n⬆️  Fazendo upload: {sample_file} -> {object_name}")
-    try:
-        result = manager.upload_file(
-            file_path=sample_file,
-            object_name=object_name,
-            bucket_name=bucket_name,
-            content_type="text/csv"
-        )
-        print(f"   ✅ Upload concluído:")
-        print(f"      • Tamanho: {result['size']:,} bytes")
-        print(f"      • ETag: {result['etag']}")
-        print(f"      • Data: {result['uploaded_at']}")
-    except Exception as e:
-        print(f"   ❌ Erro no upload: {e}")
-        return
 
-def download(object_name, bucket_name, download_path):
-    # 9. Download do arquivo
-    print(f"\n⬇️  Fazendo download: {object_name} -> {download_path}")
-    try:
-        result = manager.download_file(
-            bucket_name=bucket_name,
-            object_name=object_name,
-            file_path=download_path
-        )
-        print(f"   ✅ Download concluído:")
-        print(f"      • Arquivo local: {result['local_path']}")
-        print(f"      • Tamanho: {result['size']:,} bytes")
-    except Exception as e:
-        print(f"   ❌ Erro no download: {e}")
-
-def read_file(object_name, bucket_name):
-    try:
-        response = manager.client.get_object(bucket_name, object_name)
-        data = response.read()
-
-        # Converte o conteúdo em DataFrame
-        df = pd.read_parquet(BytesIO(data))
-        return df
-    except Exception as e:
-        print(f"   ❌ Erro na leitura do arquivo: {e}")
-
-#upload('dados/demandaFracionado.parquet', 'consultoria-fabio', r'\\tableau\Central_de_Performance\BI\Local\Bases_Tratadas\Banca_Frete_OF.parquet')
-#download('dados/demandaFracionado.parquet', 'consultoria-fabio', r"C:\Users\ricardo.santos\Downloads\TESTE.parquet")
-
-#print('Fim')
+# Função auxiliar pública
+def read_file(object_name: str, bucket: str = None):
+    """Função utilitária para ler arquivos sem precisar criar instância."""
+    global manager
+    if manager is None:
+        print("⚠️  Manager não inicializado, tentando reconectar...")
+        try:
+            manager = MinIOManager()
+        except Exception as e:
+            print(f"❌ Erro ao reconectar ao MinIO: {e}")
+            return None
+    return manager.read_file(object_name, bucket)
