@@ -10,8 +10,9 @@ from Minio.minio_client import MinIOManager, MinIOConfigError, MinIOConnectionEr
 # ✅ Tentativa 1: ler do .env (local)
 from dotenv import load_dotenv
 from pathlib import Path
-env_path = Path(__file__).resolve().parents[1] / ".env"
-load_dotenv(env_path)
+#env_path = Path(__file__).resolve().parents[1] / ".env"
+#load_dotenv(env_path)
+load_dotenv()  # carrega o .env local, se existir
 
 # ✅ Tentativa 2: ler do st.secrets (Streamlit Cloud)
 try:
@@ -95,6 +96,7 @@ def read_file(object_name: str, bucket: str = None):
             print(f"❌ Erro ao reconectar ao MinIO: {e}")
             return None
     return manager.read_file(object_name, bucket)
+
 
 
 
