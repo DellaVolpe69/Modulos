@@ -11,6 +11,7 @@ ENV_PATH = os.path.join(os.path.dirname(__file__), "..", ".env")
 # Carregar variáveis de ambiente
 if os.path.exists(ENV_PATH):
     load_dotenv(ENV_PATH)
+    print("🔍 Debug ENV:", os.getenv("MINIO_ENDPOINT"))
 else:
     print(f"⚠️  Arquivo .env não encontrado em: {ENV_PATH}")
 
@@ -93,3 +94,4 @@ def read_file(object_name: str, bucket: str = None):
             print(f"❌ Erro ao reconectar ao MinIO: {e}")
             return None
     return manager.read_file(object_name, bucket)
+
