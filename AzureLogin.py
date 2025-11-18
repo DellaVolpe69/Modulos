@@ -18,6 +18,31 @@ url_logo = "https://raw.githubusercontent.com/DellaVolpe69/Images/main/DellaVolp
 
 ############################################
 
+# aplique antes do conteúdo
+st.markdown(
+    f"""
+    <style>
+    /* Fundo da aplicação inteira */
+    .stApp {{
+        background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+            url("{url_imagem}");
+        background-size: cover;
+    }}
+
+    /* Remove fundo padrão dos elementos de cabeçalho que às vezes ‘brigam’ com o BG */
+    header, [data-testid="stHeader"] {{
+        background: transparent;
+    }}
+
+    /* Opcional: clareia cards/expander se você usar esses componentes */
+    .stExpander, .st-emotion-cache-16idsys, .stCard {{
+        background: rgba(0,0,0,0.35) !important;
+    }}
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # Configurações do Azure AD OAuth2
 client_id = st.secrets["AZURE_CLIENT_ID"]
 client_secret = st.secrets["AZURE_CLIENT_SECRET"]
@@ -174,6 +199,7 @@ user_email = (
     or "desconhecido"
 
 )
+
 
 
 
