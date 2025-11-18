@@ -75,10 +75,10 @@ if st.session_state["token"] is None:
     esp1, centro, esp2 = st.columns([1, 1, 1])
 
     with centro:        
-        st.markdown(
-            "<h3 style='text-align: center; color: white; !important'> Tela de Acesso</h3>",
-            unsafe_allow_html=True
-        )
+        #st.markdown(
+        #    "<h3 style='text-align: center; color: white; !important'> Tela de Acesso</h3>",
+        #    unsafe_allow_html=True
+        #)
 
         st.markdown("""
         <style>
@@ -174,6 +174,7 @@ user_email = (
     or "desconhecido"
 
 )
+
 
 
 
