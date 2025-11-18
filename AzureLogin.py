@@ -76,7 +76,7 @@ if st.session_state["token"] is None:
 
     with centro:        
         st.markdown(
-            "<h3 style='text-align: center; color: white;'>Login</h3>",
+            "<h3 style='text-align: center; color: white;'>Login necessário</h3>",
             unsafe_allow_html=True
         )
 
@@ -174,4 +174,5 @@ user_email = (
     or "desconhecido"
 
 )
+
 
