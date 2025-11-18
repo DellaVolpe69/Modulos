@@ -13,6 +13,8 @@ import tempfile
 from urllib.parse import urlsplit, quote
 import os
 
+url_logo = "https://raw.githubusercontent.com/DellaVolpe69/Images/main/DellaVolpeLogoBranco.png"
+
 ############################################
 
 # Configurações do Azure AD OAuth2
@@ -169,4 +171,5 @@ user_email = (
     user_info.get("mail")
     or user_info.get("userPrincipalName")
     or "desconhecido"
+
 )
