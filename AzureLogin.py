@@ -13,6 +13,7 @@ import tempfile
 from urllib.parse import urlsplit, quote
 import os
 
+url_imagem = "https://raw.githubusercontent.com/DellaVolpe69/Images/main/AppBackground02.png"
 url_logo = "https://raw.githubusercontent.com/DellaVolpe69/Images/main/DellaVolpeLogoBranco.png"
 
 ############################################
@@ -173,3 +174,4 @@ user_email = (
     or "desconhecido"
 
 )
+
