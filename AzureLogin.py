@@ -206,30 +206,6 @@ user_email = (
 #################################
 
 
-def get_logged_user():
-    """
-    Retorna nome e e-mail do usuário autenticado via Azure AD.
-    Se não houver login, retorna (None, None).
-    """
-    if "token" not in st.session_state or st.session_state["token"] is None:
-        return None, None
-
-    azure = OAuth2Session(client_id, token=st.session_state["token"])
-    me_resp = azure.get("https://graph.microsoft.com/v1.0/me")
-    if me_resp.status_code != 200:
-        return None, None
-
-    user_info = me_resp.json()
-    user_name = user_info.get("displayName", "Usuário")
-    user_email = (
-        user_info.get("mail")
-        or user_info.get("userPrincipalName")
-        or "desconhecido"
-    )
-    return user_name, user_email
-
-
-
 
 
 
