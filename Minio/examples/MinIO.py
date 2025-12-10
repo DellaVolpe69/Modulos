@@ -70,3 +70,36 @@ def read_file(object_name: str, bucket_name: str) -> pd.DataFrame:
                 resp.release_conn()
             except Exception:
                 pass
+
+def listar_anexos(bucket_name: str, id_registro: str) -> list[str]:
+    """
+    Lista todos os anexos armazenados no MinIO para um registro específico,
+    usando o padrão <id_registro>_<n>.<ext>.
+    """
+
+    if manager is None:
+        raise RuntimeError(
+            "MinIO manager não inicializado. Falha anterior de conexão? Verifique as credenciais."
+        )
+
+    prefix = f"{id_registro}_"
+    anexos = []
+    objects_iter = None
+
+    try:
+        # Busca todos os objetos que começam com o prefixo
+        objects_iter = manager.client.list_objects(
+            bucket_name,
+            prefix=prefix,
+            recursive=True
+        )
+
+        for obj in objects_iter:
+            anexos.append(obj.object_name)
+
+        return anexos
+
+    except Exception as e:
+        raise RuntimeError(
+            f"Erro ao listar anexos no bucket '{bucket_name}' com prefixo '{prefix}': {e}"
+        ) from e
