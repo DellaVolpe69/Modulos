@@ -3,7 +3,7 @@ import pandas as pd
 
 # 🔑 Suas credenciais
 url = "https://hnppkctmiqrcobkzajzl.supabase.co"
-key = "sb_publishable_LguFtpFOOAhEouz4ToC5Bw_e9Y8t_7U"
+key = ""
 
 def conexao():
     # 🔗 Conectar ao Supabase
@@ -11,6 +11,7 @@ def conexao():
     supabase: Client = create_client(url, key)
     print('Conectando')
     return supabase
+
 
 
 
