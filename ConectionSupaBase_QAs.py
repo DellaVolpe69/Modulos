@@ -11,12 +11,3 @@ def conexao():
     supabase: Client = create_client(url, key)
     print('Conectando')
     return supabase
-
-
-
-
-
-
-
-
-
