@@ -1,9 +1,10 @@
 from supabase import create_client, Client
 import pandas as pd
+import os
 
 # 🔑 Suas credenciais
-url = "https://hnppkctmiqrcobkzajzl.supabase.co"
-key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhucHBrY3RtaXFyY29ia3phanpsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDA4MDMyOCwiZXhwIjoyMDc1NjU2MzI4fQ.Ve1yUZpXDrYeRW4tKnqBl73pLBc2COVch0_bcRdgkxw"
+url = os.getenv("SUPABASE_URL")
+key = os.getenv("SUPABASE_KEY")
 
 def conexao():
     # 🔗 Conectar ao Supabase
