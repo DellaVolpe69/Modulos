@@ -1,12 +1,13 @@
 import streamlit as st
 from requests_oauthlib import OAuth2Session
+import os
 
 # Configurações do Azure AD OAuth2
-client_id = "9f155302-2159-4d3f-b2d2-54e16df7f77d"
-client_secret = "~3f8Q~MBowQURXaAWcuHaeVXkWLm1BucaVivPckQ"
+client_id = os.getenv("STREAMLIT_CLIENT_ID")
+client_secret = os.getenv("STREAMLIT_CLIENT_SECRET")
 redirect_uri = "https://priorizanfs.streamlit.app/"
-authorization_base_url = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize"
-token_url = "https://login.microsoftonline.com/common/oauth2/v2.0/token"
+authorization_base_url = os.getenv("STREAMLIT_BASE_URL")
+token_url = os.getenv("STREAMLIT_KEY")
 scope = [
     "openid",
     "email",
