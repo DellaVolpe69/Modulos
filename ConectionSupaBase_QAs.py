@@ -3,8 +3,8 @@ import pandas as pd
 import os
 
 # 🔑 Suas credenciais
-url = os.getenv("SUPABASE_URL")
-key = os.getenv("SUPABASE_KEY")
+url = os.getenv("SUPABASE_URL_TDV")
+key = os.getenv("SUPABASE_KEY_TDV")
 
 def conexao():
     # 🔗 Conectar ao Supabase
